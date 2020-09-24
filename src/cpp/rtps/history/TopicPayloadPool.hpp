@@ -44,7 +44,7 @@ public:
     {
         logInfo(RTPS_UTILS, "PayloadPool destructor");
 
-        for (Payload* payload : all_payloads_)
+        for (PayloadNode* payload : all_payloads_)
         {
             free(payload);
         }
@@ -85,14 +85,7 @@ public:
 
 protected:
 
-    /*
-        struct FreePayload
-        {
-            uint32_t max_size = 0;
-            octet* data = nullptr;
-        };
-     */
-    class Payload
+    class PayloadNode
     {
     public:
 
@@ -102,21 +95,21 @@ protected:
         static constexpr uint8_t reference_offset = 2 * sizeof(uint32_t);
         static constexpr uint8_t data_offset = 3 * sizeof(uint32_t);
 
-        explicit Payload(
+        explicit PayloadNode(
                 uint32_t size)
         {
             buffer = (octet*)calloc(size + data_offset, sizeof(octet));
             data_size(size);
         }
 
-        explicit Payload(
+        explicit PayloadNode(
                 octet* data)
         {
 
             buffer = data - data_offset;
         }
 
-        ~Payload()
+        ~PayloadNode()
         {
             free(buffer);
         }
@@ -184,7 +177,7 @@ protected:
     /**
      * Adds a new payload in the pool, but does not add it to the list of free payloads
      */
-    virtual Payload* allocate(
+    virtual PayloadNode* allocate(
             uint32_t size);
 
     virtual void update_maximum_size(
@@ -249,8 +242,9 @@ protected:
     uint32_t infinite_histories_count_  = 0;  //< Number of infinite histories reserved
     uint32_t finite_max_pool_size_      = 0;  //< Maximum size of the pool if no infinite histories were reserved
 
-    std::vector<Payload*> free_payloads_;
-    std::vector<Payload*> all_payloads_;
+    std::vector<PayloadNode*> free_payloads_; //< Payloads that are free
+    std::vector<PayloadNode*> all_payloads_;  //< All payloads
+
 };
 
 

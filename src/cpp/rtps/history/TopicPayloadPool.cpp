@@ -34,7 +34,7 @@ bool TopicPayloadPool::get_payload(
         uint32_t size,
         CacheChange_t& cache_change)
 {
-    Payload* payload = nullptr;
+    PayloadNode* payload = nullptr;
     if (free_payloads_.empty())
     {
         payload = allocate(size); //Allocates a single payload
@@ -71,7 +71,7 @@ bool TopicPayloadPool::get_payload(
 
     if (data_owner == this)
     {
-        Payload* payload = all_payloads_.at(Payload::data_index(data.data));
+        PayloadNode* payload = all_payloads_.at(PayloadNode::data_index(data.data));
         cache_change.serializedPayload.data = payload->data();
         cache_change.serializedPayload.max_size = payload->data_size();
         cache_change.payload_owner(this);
@@ -101,7 +101,7 @@ bool TopicPayloadPool::release_payload(
 {
     assert(cache_change.payload_owner() == this);
 
-    Payload* payload = all_payloads_.at(Payload::data_index(cache_change.serializedPayload.data));
+    PayloadNode* payload = all_payloads_.at(PayloadNode::data_index(cache_change.serializedPayload.data));
     if (!payload->dereference())
     {
         free_payloads_.push_back(payload);
@@ -134,10 +134,10 @@ bool TopicPayloadPool::release_history(
     return true;
 }
 
-TopicPayloadPool::Payload* TopicPayloadPool::allocate(
+TopicPayloadPool::PayloadNode* TopicPayloadPool::allocate(
         uint32_t size)
 {
-    Payload* payload = nullptr;
+    PayloadNode* payload = nullptr;
 
     if (all_payloads_.size() >= max_pool_size_)
     {
@@ -145,7 +145,7 @@ TopicPayloadPool::Payload* TopicPayloadPool::allocate(
         return nullptr;
     }
 
-    payload = new Payload(size);
+    payload = new PayloadNode(size);
     all_payloads_.push_back(payload);
     payload->data_index(all_payloads_.size() - 1);
     return payload;
@@ -198,7 +198,7 @@ void TopicPayloadPool::reserve (
 
     for (uint32_t i = all_payloads_.size(); i < min_num_payloads; ++i)
     {
-        Payload* payload = new Payload(size);
+        PayloadNode* payload = new PayloadNode(size);
         all_payloads_.push_back(payload);
         free_payloads_.push_back(payload);
         payload->data_index(all_payloads_.size() - 1);
@@ -212,7 +212,7 @@ bool TopicPayloadPool::shrink (
 
     while (max_num_payloads < all_payloads_.size())
     {
-        Payload* payload = free_payloads_.back();
+        PayloadNode* payload = free_payloads_.back();
         free_payloads_.pop_back();
 
         // Find data in allPayloads, remove element, then delete it
@@ -230,7 +230,7 @@ bool TopicPayloadPool::resize_payload (
         uint32_t& size,
         uint32_t new_size)
 {
-    Payload* payload = all_payloads_.at(Payload::data_index(data));
+    PayloadNode* payload = all_payloads_.at(PayloadNode::data_index(data));
     if (payload->resize(new_size))
     {
         data = payload->data();

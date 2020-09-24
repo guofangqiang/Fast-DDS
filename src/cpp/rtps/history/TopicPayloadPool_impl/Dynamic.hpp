@@ -34,7 +34,7 @@ public:
     {
         assert(cache_change.payload_owner() == this);
 
-        Payload* payload = all_payloads_.at(Payload::data_index(cache_change.serializedPayload.data));
+        PayloadNode* payload = all_payloads_.at(PayloadNode::data_index(cache_change.serializedPayload.data));
         if (!payload->dereference())
         {
             //First remove it from all_payloads
