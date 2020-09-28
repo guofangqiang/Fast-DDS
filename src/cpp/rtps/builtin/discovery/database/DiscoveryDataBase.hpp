@@ -42,7 +42,7 @@ namespace ddb {
 
 //typedef std::shared_timed_mutex share_mutex_t;
 // only working in C++17
-typedef std::mutex share_mutex_t;
+typedef std::recursive_mutex share_mutex_t;
 
 /**
  * Class to manage the discovery data base
