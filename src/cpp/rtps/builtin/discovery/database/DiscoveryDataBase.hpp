@@ -72,9 +72,7 @@ public:
             const AckedFunctor &);
 
         AckedFunctor(
-            AckedFunctor&& r)
-            : AckedFunctor(r)
-        {}
+            AckedFunctor&& r);
 
         AckedFunctor() = delete;
 
