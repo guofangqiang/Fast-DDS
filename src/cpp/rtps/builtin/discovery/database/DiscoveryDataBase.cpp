@@ -1019,15 +1019,18 @@ const std::vector<fastrtps::rtps::GuidPrefix_t> DiscoveryDataBase::remote_partic
 
 DiscoveryDataBase::AckedFunctor::AckedFunctor(
         DiscoveryDataBase* db,
-        eprosima::fastrtps::rtps::CacheChange_t* change)
+        eprosima::fastrtps::rtps::CacheChange_t* change,
+        bool& pending)
     : db_(db)
     , change_(change)
+    , pending_(pending)
 {
     db_->exclusive_lock_();
 }
 
 DiscoveryDataBase::AckedFunctor::AckedFunctor(
         const DiscoveryDataBase::AckedFunctor& r)
+    : pending_(r.pending_)
 {
     db_ = r.db_;
     change_ = r.change_;

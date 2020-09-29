@@ -66,7 +66,8 @@ public:
 
         AckedFunctor(
                 DiscoveryDataBase* db,
-                eprosima::fastrtps::rtps::CacheChange_t* change);
+                eprosima::fastrtps::rtps::CacheChange_t* change,
+                bool& pending);
 
         AckedFunctor(
             const AckedFunctor &);
@@ -81,17 +82,11 @@ public:
         void operator () (
                 eprosima::fastrtps::rtps::ReaderProxy* reader_proxy);
 
-        bool pending()
-        {
-            return pending_;
-        }
-
     private:
 
         DiscoveryDataBase* db_;
         eprosima::fastrtps::rtps::CacheChange_t* change_;
-        bool pending_ = false;
-
+        bool& pending_;
     };
     friend class AckedFunctor;
 
@@ -132,9 +127,9 @@ public:
     // Functions to process_writers_acknowledgements()
     // Return the functor, class that works as a lambda
     AckedFunctor functor(
-            eprosima::fastrtps::rtps::CacheChange_t* change)
+            eprosima::fastrtps::rtps::CacheChange_t* change, bool& pending)
     {
-        return DiscoveryDataBase::AckedFunctor(this, change);
+        return DiscoveryDataBase::AckedFunctor(this, change, pending);
     }
 
     /* Delete all information relative to the entity that produced a CacheChange

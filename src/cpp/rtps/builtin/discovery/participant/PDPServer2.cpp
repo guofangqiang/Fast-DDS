@@ -764,11 +764,12 @@ bool PDPServer2::process_change_acknowledgement(
         // Call to `StatefulWriter::for_each_reader_proxy()`. This will update
         // `participants_|writers_|readers_[guid_prefix]::relevant_participants_builtin_ack_status`, and will also set
         // `pending` to whether the change is has been acknowledged by all readers.
-        fastdds::rtps::ddb::DiscoveryDataBase::AckedFunctor func = discovery_db_.functor(c);
+        bool pending = false;
+        fastdds::rtps::ddb::DiscoveryDataBase::AckedFunctor func = discovery_db_.functor(c, pending);
         writer->for_each_reader_proxy(c, func);
 
         // If the change has been acknowledge by everyone
-        if (!func.pending() &&
+        if (!pending &&
             !(discovery_db_.is_participant(c) &&
                 discovery_db_.guid_from_change(c) == mp_builtin->mp_participantImpl->getGuid()))
         {
